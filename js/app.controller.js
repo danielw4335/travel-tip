@@ -43,6 +43,7 @@ function renderLocs(locs) {
                 <span>${loc.name}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
             </h4>
+            <p class="muted address">${loc.geo.address}</p>
             <p class="muted">
                 Created: ${utilService.elapsedTime(loc.createdAt)}
                 ${(loc.createdAt !== loc.updatedAt) ?
@@ -70,7 +71,7 @@ function renderLocs(locs) {
 
 function onRemoveLoc(locId) {
     if (!confirm('Are you sure?')) return
-    
+
     locService.remove(locId)
         .then(() => {
             flashMsg('Location removed')
