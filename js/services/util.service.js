@@ -53,20 +53,30 @@ function getRandomLatLng() {
     return { lat: getRandomInRange(), lng: getRandomInRange() }
 }
 
-function elapsedTime(pastMs) {
-    const now = new Date()
-    const secondsPast = Math.round((now - pastMs) / 1000)
+// function elapsedTime(pastMs) {
+//     const now = new Date()
+//     const secondsPast = Math.round((now - pastMs) / 1000)
 
-    if (secondsPast < 60 * 5) return `just now` 
+//     if (secondsPast < 60 * 5) return `today` 
     
-    const minutesPast = Math.floor(secondsPast / 60)
-    if (minutesPast < 60) return `last hour` 
+//     const minutesPast = Math.floor(secondsPast / 60)
+//     if (minutesPast < 60) return `last hour` 
 
-    const hoursPast = Math.floor(minutesPast / 60)
-    if (hoursPast < 24)  return `today` 
+//     const hoursPast = Math.floor(minutesPast / 60)
+//     if (hoursPast < 24)  return `today` 
 
-    return `${Math.floor(hoursPast / 24)} days ago`
+//     return `${Math.floor(hoursPast / 24)} days ago`
 
+// }
+
+function elapsedTime(pastMs){
+    const now = new Date()
+    const pastDate = new Date(pastMs)
+
+    if (now.toDateString() === pastDate.toDateString()){
+        return 'today'
+    } 
+    return 'past'
 }
 
 function updateQueryParams(queryParamsObj) {
