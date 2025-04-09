@@ -55,6 +55,17 @@
                         </label>
                     </p>
                 </section>
+
+                <dialog class="modal">
+                    <button class="btn-closeModal" onclick="app.onCloseModal()">X</button>
+                    <form onsubmit="app.onSendModal(event)">
+                        <input type="text" name="locName" placeholder="Loc name" />
+                        <input id="pi_input" name="rate" type="range" min="0" max="5" step="1" list="markers" />
+                        <p>Rate: <output id="value"></output></p>
+                        <button type="submit">Add</button>
+                      </form>
+                </dialog>
+
                 <h3>Locations</h3>
                 <ul class="loc-list"></ul>
                 <section class="loc-stats">

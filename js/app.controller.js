@@ -6,6 +6,7 @@ window.onload = onInit
 
 var gUserPos
 
+
 // To make things easier in this project structure 
 // functions that are called from DOM are defined on a global app object
 window.app = {
@@ -18,6 +19,8 @@ window.app = {
     onShareLoc,
     onSetSortBy,
     onSetFilterBy,
+    onSendModal,
+    onCloseModal
 }
 
 function onInit() {
@@ -104,24 +107,19 @@ function onSearchAddress(ev) {
 }
 
 function onAddLoc(geo) {
-    const locName = prompt('Loc name', geo.address || 'Just a place')
-    if (!locName) return
 
-    const loc = {
-        name: locName,
-        rate: +prompt(`Rate (1-5)`, '3'),
-        geo
-    }
-    locService.save(loc)
-        .then((savedLoc) => {
-            flashMsg(`Added Location (id: ${savedLoc.id})`)
-            utilService.updateQueryParams({ locId: savedLoc.id })
-            loadAndRenderLocs()
-        })
-        .catch(err => {
-            console.error('OOPs:', err)
-            flashMsg('Cannot add location')
-        })
+    const elDialog = document.querySelector('.modal')
+    elDialog.dataset.geo = JSON.stringify(geo)
+    elDialog.showModal()
+
+    const value = document.querySelector("#value")
+    const input = document.querySelector("#pi_input")
+    value.textContent = input.value
+    input.addEventListener("input", (event) => {
+        value.textContent = event.target.value
+    })
+
+
 }
 
 function loadAndRenderLocs() {
@@ -181,9 +179,9 @@ function displayLoc(loc) {
     document.querySelector('.loc.active')?.classList?.remove('active')
     document.querySelector(`.loc[data-id="${loc.id}"]`).classList.add('active')
 
-let pos = locService.getPos(loc.id)
-let distance = utilService.getDistance(gUserPos, pos, 'K') || ''
-if (distance) distance = (`Distance:${distance} KM.`)
+    let pos = locService.getPos(loc.id)
+    let distance = utilService.getDistance(gUserPos, pos, 'K') || ''
+    if (distance) distance = (`Distance:${distance} KM.`)
 
     mapService.panTo(loc.geo)
     mapService.setMarker(loc)
@@ -329,3 +327,43 @@ function cleanStats(stats) {
     }, [])
     return cleanedStats
 }
+
+function onCloseModal() {
+    const elDialog = document.querySelector('.modal').close()
+}
+
+function onSendModal(event) {
+    event.preventDefault()
+
+    const form = event.target
+    const locName = form.elements.locName.value
+    const rate = form.elements.rate.value
+
+if (!locName) return
+
+const elDialog = document.querySelector('.modal')
+let geo = JSON.parse(elDialog.dataset.geo)
+console.log(geo)
+
+const loc = {
+    name: locName,
+    rate: rate,
+    geo
+}
+    locService.save(loc)
+    .then((savedLoc) => {
+        flashMsg(`Added Location (id: ${savedLoc.id})`)
+        utilService.updateQueryParams({ locId: savedLoc.id })
+        loadAndRenderLocs()
+    })
+    .catch(err => {
+        console.error('OOPs:', err)
+        flashMsg('Cannot add location')
+    })
+
+    onCloseModal()
+}
+
+
+
+
