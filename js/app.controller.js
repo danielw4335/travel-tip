@@ -20,7 +20,8 @@ window.app = {
     onSetSortBy,
     onSetFilterBy,
     onSendModal,
-    onCloseModal
+    onCloseModal,
+    onToggleTheme
 }
 
 function onInit() {
@@ -388,4 +389,8 @@ function onSendModal(event) {
             })
     }
     onCloseModal()
+}
+
+function onToggleTheme() {
+document.documentElement.classList.toggle('theme-alt')
 }
