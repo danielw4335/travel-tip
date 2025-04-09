@@ -8,7 +8,13 @@ export const utilService = {
     elapsedTime,
     getColors,
     updateQueryParams,
-    getDistance
+    getDistance,
+    getPos
+}
+
+function getPos(loc) {
+    let pos = {lat: loc.geo.lat, lng: loc.geo.lng}
+    return pos
 }
 
 function saveToStorage(key, value) {
@@ -95,6 +101,7 @@ function getColors() {
 }
 
 function getDistance(latLng1, latLng2, unit) {
+    if(!latLng1)return
     if ((latLng1.lat == latLng2.lat) && (latLng1.lng == latLng2.lng)) {
         return 0
     }
