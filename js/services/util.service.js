@@ -9,13 +9,9 @@ export const utilService = {
     getColors,
     updateQueryParams,
     getDistance,
-    getPos
 }
 
-function getPos(loc) {
-    let pos = {lat: loc.geo.lat, lng: loc.geo.lng}
-    return pos
-}
+
 
 function saveToStorage(key, value) {
     localStorage.setItem(key, JSON.stringify(value))

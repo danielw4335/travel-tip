@@ -30,7 +30,8 @@ export const locService = {
     save,
     setFilterBy,
     setSortBy,
-    getLocCountByRateMap
+    getLocCountByRateMap,
+    getPos
 }
 
 function query() {
@@ -60,6 +61,14 @@ function query() {
 
             return locs
         })
+}
+
+function getPos(id) {
+    const locs = utilService.loadFromStorage(DB_KEY)
+    let fId = locs.findIndex((obj) => obj.id === id)
+   let loc = locs[fId]
+   let pos = {lat: loc.geo.lat, lng: loc.geo.lng}
+    return pos
 }
 
 function getById(locId) {
