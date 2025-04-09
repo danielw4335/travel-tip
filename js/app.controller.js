@@ -110,6 +110,7 @@ function onAddLoc(geo) {
 
     const elDialog = document.querySelector('.modal')
     elDialog.dataset.geo = JSON.stringify(geo)
+    elDialog.querySelector('[name=locName]').value = geo.address
     elDialog.showModal()
 
     const value = document.querySelector("#value")
@@ -118,7 +119,6 @@ function onAddLoc(geo) {
     input.addEventListener("input", (event) => {
         value.textContent = event.target.value
     })
-
 
 }
 
@@ -149,20 +149,19 @@ function onPanToUserPos() {
 function onUpdateLoc(locId) {
     locService.getById(locId)
         .then(loc => {
-            const rate = prompt('New rate?', loc.rate)
-            if (rate && rate !== loc.rate) {
-                loc.rate = rate
-                locService.save(loc)
-                    .then(savedLoc => {
-                        flashMsg(`Rate was set to: ${savedLoc.rate}`)
-                        loadAndRenderLocs()
-                    })
-                    .catch(err => {
-                        console.error('OOPs:', err)
-                        flashMsg('Cannot update location')
-                    })
-
-            }
+            const elDialog = document.querySelector('.modal')
+            elDialog.dataset.geo = JSON.stringify(loc.geo)
+            elDialog.dataset.locId = locId
+            elDialog.querySelector('[name=locName]').value = loc.name
+            const rateInput = elDialog.querySelector('[name=rate]')
+            const rateOutput = elDialog.querySelector('#value')
+            rateInput.value = loc.rate
+            rateOutput.textContent = loc.rate
+            elDialog.showModal()
+        })
+        .catch(err => {
+            console.error('OOPs:', err)
+            flashMsg('Cannot load location for update')
         })
 }
 
@@ -288,7 +287,7 @@ function handleStats(stats, selector) {
 
     const labels = cleanStats(stats)
     const colors = utilService.getColors()
-    
+
 
 
     var sumPercent = 0
@@ -346,31 +345,47 @@ function onSendModal(event) {
     const locName = form.elements.locName.value
     const rate = form.elements.rate.value
 
-if (!locName) return
+    if (!locName) return
 
-const elDialog = document.querySelector('.modal')
-let geo = JSON.parse(elDialog.dataset.geo)
-console.log(geo)
+    const elDialog = document.querySelector('.modal')
+    let geo = JSON.parse(elDialog.dataset.geo)
+    const locId = elDialog.dataset.locId
 
-const loc = {
-    name: locName,
-    rate: rate,
-    geo
-}
-    locService.save(loc)
-    .then((savedLoc) => {
-        flashMsg(`Added Location (id: ${savedLoc.id})`)
-        utilService.updateQueryParams({ locId: savedLoc.id })
-        loadAndRenderLocs()
-    })
-    .catch(err => {
-        console.error('OOPs:', err)
-        flashMsg('Cannot add location')
-    })
+    const loc = {
+        name: locName,
+        rate: rate,
+        geo
+    }
 
+    if (locId) {
+        locService.getById(locId)
+            .then(existingLoc => {
+                existingLoc.name = loc.name
+                existingLoc.rate = loc.rate
+                existingLoc.geo = loc.geo
+
+                return locService.save(existingLoc)
+            })
+            .then(savedLoc => {
+                flashMsg(`Location updated (id: ${savedLoc.id})`)
+                utilService.updateQueryParams({ locId: savedLoc.id })
+                loadAndRenderLocs()
+            })
+            .catch(err => {
+                console.error('OOPs:', err);
+                flashMsg('Cannot update location')
+            })
+    } else {
+        locService.save(loc)
+            .then(savedLoc => {
+                flashMsg(`Added Location (id: ${savedLoc.id})`)
+                utilService.updateQueryParams({ locId: savedLoc.id })
+                loadAndRenderLocs()
+            })
+            .catch(err => {
+                console.error('OOPs:', err)
+                flashMsg('Cannot add location')
+            })
+    }
     onCloseModal()
 }
-
-
-
-
